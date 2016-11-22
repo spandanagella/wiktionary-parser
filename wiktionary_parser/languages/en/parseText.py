@@ -59,7 +59,7 @@ class ParseText:
 		line = line[2:].strip()
 		language = line.strip().split('{{')[0]
 		word_trans = line[len(language):]
-		language = language.replace(':', ' ')
+		language = language.replace(':', ' ').strip()
 		self.sense_translations[sense][language] = []
 		#print language, word_trans
 		if word_trans == '':
