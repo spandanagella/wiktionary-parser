@@ -63,5 +63,9 @@ class DeParseText:
 		language = match_pattern[0]
 		words = []
 		for word_format in match_pattern[1:]:
-		    words.append(word_format.split('|')[2])
+		    spl = word_format.split('|')
+		    if len(spl)<=2:
+			continue	
+		    #print word_format, '--- Line---:', line
+		    words.append(spl[2])
 		self.verb_translations[language] = words

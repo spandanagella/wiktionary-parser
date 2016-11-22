@@ -41,10 +41,13 @@ however still needs to be parsed elsewhere.
 [[vi:abolitionism]]
 """
 
+import sys
+sys.path.append((0, '/disk/scratch/s1146856/project_codes/tools/sense_stuff/wiktionary-parser-xml/wiktionary_parser'))
 from xml.dom.minidom import parseString
 
 from wiktionary_utils.text_splitter import Splitter, Block
 from page import Page
+import time
 
 
 class PageBlock(Block):
@@ -78,7 +81,8 @@ class XMLPageParser(object):
             yield page
 
 
-    def from_titles(self, wanted_titles, session=None):
+    def from_titles(self, wanted_titles, session=None, max_time=600):
+	start_time = time.time()
         for page_contents in self.xml_splitter:
             page_xml = ''.join([self.pbc.start_pattern, page_contents.text, self.pbc.stop_pattern])
             page_dom = parseString(page_xml)
@@ -90,6 +94,9 @@ class XMLPageParser(object):
                 page = self.page_class.get_and_update(
                     self.session, title, revision_id, text)
                 yield page
+	    now_time = time.time()
+	    if (now_time -start_time)>=max_time:
+		break
 
     def get_node(self, node, tag):
         node_obj = self.get_node_obj(node, tag)
@@ -123,5 +130,10 @@ class XMLPageParser(object):
             raise self.CannotParse('More than one match')
 
 if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
+    #import doctest
+    #doctest.testmod()
+    xml_file = open('../../../../datasets/sense_disambiguation_datasets/enwiktionary-20161101-pages-articles-multistream.xml')
+    xml_parser = XMLPageParser(xml_file)
+    for page in xml_parser:
+	if page.title == 'ride':
+		print page.text
